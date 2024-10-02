@@ -1,0 +1,43 @@
+version: '3'
+services:
+  app:
+    image: youapp-be
+    container_name: youapp-be
+    build: .
+    ports:
+      - "8002:8000"
+    environment:
+      - MONGO_URL=mongodb://root:example@mongodb:27017/youapp-db
+      - RABBITMQ_URL=amqp://guest:guest@rabbitmq:5672
+    depends_on:
+      - mongodb
+      - rabbitmq
+    networks:
+      - nest_network
+
+  mongodb:
+    image: mongo
+    container_name: mongodb
+    ports:
+      - "27020:27017"
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: root
+      MONGO_INITDB_ROOT_PASSWORD: example
+    networks:
+     - nest_network
+
+  rabbitmq:
+    image: rabbitmq:3-management
+    container_name: rabbitmq
+    ports:
+      - "5672:5672"
+      - "15672:15672"
+    environment:
+      RABBITMQ_DEFAULT_USER: guest
+      RABBITMQ_DEFAULT_PASS: guest
+    networks:
+      - nest_network
+
+networks:
+  nest_network:
+    driver: bridge
