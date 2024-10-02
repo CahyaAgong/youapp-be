@@ -4,10 +4,13 @@ import { Transport } from '@nestjs/microservices';
 import { RABBITMQ_CONFIG } from './config/constants';
 
 import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger';
+import { ValidationPipe } from '@nestjs/common';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
   const port = 8000;
+
+  app.useGlobalPipes(new ValidationPipe());
 
   app.connectMicroservice({
     transport: Transport.RMQ,

@@ -37,18 +37,6 @@ export class ChatController {
     return this.chatService.getMessagesByUserId(req.user.userId);
   }
 
-  // @UseGuards(JwtAuthGuard)
-  // @Get('fetchMessages')
-  // async getMessages() {
-  //   return this.chatService.getMessages();
-  // }
-
-  // @UseGuards(JwtAuthGuard)
-  // @Get('fetchNotifications')
-  // async getNotification(@Request() req) {
-  //   return this.chatService.getNotification(req.user.userId);
-  // }
-
   @EventPattern(RABBITMQ_CONFIG.CHAT_MESSAGE)
   handleReceiveMessage(@Payload() message: ResponseMessageType) {
     return this.chatService.handleMessage(message);

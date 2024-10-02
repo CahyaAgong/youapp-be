@@ -7,7 +7,7 @@ export class PostProfileDto {
   @IsString()
   name: string;
 
-  @ApiProperty({ example: '10 10 2005 | 10/10/2005 | 10-10-2005' })
+  @ApiProperty({ example: '10-10-2005' })
   @IsNotEmpty()
   @IsString()
   birthday: string;

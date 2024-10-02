@@ -18,14 +18,10 @@ export class AuthController {
   @ApiResponse({ status: 400, description: 'Invalid data.' })
   @ApiResponse({ status: 401, description: 'Invalid Credentials.' })
   @Post('login')
-  async login(@Body() loginDto: LoginDTO) {
-    const user = await this.authService.validateUser(
-      loginDto.email,
-      loginDto.password,
-    );
-    if (!user) {
-      throw new UnauthorizedException('Invalid credentials');
-    }
+  async login(@Body() dto: LoginDTO) {
+    const user = await this.authService.validateUser(dto.email, dto.password);
+    if (!user) throw new UnauthorizedException('Invalid credentials');
+
     return this.authService.login(user);
   }
 
@@ -33,14 +29,7 @@ export class AuthController {
   @ApiResponse({ status: 201, description: 'register successfull.' })
   @ApiResponse({ status: 400, description: 'Invalid data.' })
   @Post('register')
-  async register(@Body() registerDto: RegisterDTO) {
-    const user = await this.authService.register(registerDto);
-    return { message: 'User registered successfully', user };
+  async register(@Body() dto: RegisterDTO) {
+    return await this.authService.register(dto);
   }
-
-  // @UseGuards(JwtAuthGuard)
-  // @Get('user')
-  // async getUserModel(@Request() req) {
-  //   return await this.authService.getUser(req.user.email);
-  // }
 }

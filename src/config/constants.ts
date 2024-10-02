@@ -60,3 +60,22 @@ export const NOTIFICAITON_TYPE = {
   RECEIVE_MESSAGE: 'RECEIVED_MESSAGE',
   REQUEST_FRIEND: 'REQUEST_FRIEND',
 };
+
+export const RESPONSE_MESSAGE = {
+  LOGIN_SUCCESS: 'Login Success...',
+  LOGIN_FAILED: 'Login failed....',
+  REGISTER_SUCESS: 'Register Success...',
+  REGISTER_FAILED: 'Register Failed...',
+  GET_PROFILE_SUCCESS: 'Get Profile Success...',
+  GET_PROFILE_FAILED: 'Get Profile Failed...',
+  PROFILE_EXISTED: 'Profile already exist for this user...',
+  PROFILE_NOT_FOUND: 'Profile not found...',
+  CREATE_PROFILE_SUCCESS: 'Create Profile Success...',
+  CREATE_PROFILE_FAILED: 'Create Profile Failed...',
+  UPDATE_PROFILE_SUCCESS: 'Update Profile Success...',
+  UPDATE_PROFILE_FAILED: 'Update Profile Failed...',
+  SEND_MESSAGE_SUCCESS: 'Send Message Success...',
+  SEND_MESSAGE_FAILED: 'Send Message Failed...',
+  VIEW_MESSAGE_SUCCESS: 'View Message Failed...',
+  VIEW_MESSAGE_FAILED: 'View Message Failed...',
+};

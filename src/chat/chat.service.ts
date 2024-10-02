@@ -5,11 +5,11 @@ import { ClientProxy, MessagePattern } from '@nestjs/microservices';
 import { InjectModel } from '@nestjs/mongoose';
 
 import { Message } from 'src/schema/message.schema';
-import { NOTIFICAITON_TYPE, RABBITMQ_CONFIG } from 'src/config/constants';
+import { NOTIFICAITON_TYPE, RABBITMQ_CONFIG, RESPONSE_MESSAGE } from 'src/config/constants';
 import { User } from 'src/schema/user.schema';
 import { PostMessageDTO } from 'src/dto/chat.dto';
 import { lastValueFrom } from 'rxjs';
-import { MessageListType, ResponseMessageType } from 'src/utils/types.util';
+import { ResponseMessageType } from 'src/utils/types.util';
 import { Notification } from 'src/schema/notification.schema';
 
 @Injectable()
@@ -52,10 +52,14 @@ export class ChatService {
 
     await this.notifyUser(receiverId, message._id.toString(), NOTIFICAITON_TYPE.RECEIVE_MESSAGE, `You have received a new message from ${sender.username}`)
 
-    return message;
+    return {
+      message: RESPONSE_MESSAGE.SEND_MESSAGE_SUCCESS,
+      statusCode: 201,
+      data: message
+    };
   }
 
-  async getMessagesByUserId(userId: string): Promise<MessageListType[]> {
+  async getMessagesByUserId(userId: string) {
     const objectId = new Types.ObjectId(userId);
 
     const messages = await this.messageModel
@@ -81,8 +85,13 @@ export class ChatService {
       return result;
     }, {});
   
+    const data = Object.values(groupedMessages);
 
-    return Object.values(groupedMessages);
+    return {
+      message: RESPONSE_MESSAGE.VIEW_MESSAGE_SUCCESS,
+      statusCode: 200,
+      data
+    }
   }
 
   async sendMessageToQueue(message: ResponseMessageType): Promise<void> {
@@ -97,18 +106,6 @@ export class ChatService {
     await lastValueFrom(result);
   }
 
-  async getMessages(): Promise<Message[]> {
-    return this.messageModel.find().exec();
-  }
-
-  async getNotification(userId: string) {
-    const notif = this.notificationModel;
-    
-    if (userId === '1') return notif.find().sort({ createdAt: 1 }).exec()
-
-    return notif.find({ receiverId: userId }).sort({ createdAt: 1 }).exec()
-  }
-
   @MessagePattern(RABBITMQ_CONFIG.CHAT_QUEUE)
   async handleMessage(data: ResponseMessageType) {
     console.log(`Received message from : ${data.senderId} :`, data.text);
@@ -118,6 +115,7 @@ export class ChatService {
   async handleNotification(notificationData: any) {
     const notification = new this.notificationModel(notificationData);
     await notification.save();
+
     console.log('Notification sent:', notificationData);
   }
 }

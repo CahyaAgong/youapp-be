@@ -23,6 +23,7 @@ export class RegisterDTO {
 
 export class LoginDTO {
   @ApiProperty({ description: 'Registered Email', example: 'john@mail.com' })
+  @IsEmail()
   @IsNotEmpty()
   email: string;
 

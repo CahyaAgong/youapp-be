@@ -19,7 +19,7 @@ export class ProfileController {
   @UseGuards(JwtAuthGuard)
   @Get('getProfile')
   async getProfile(@Request() req) {
-    return this.profileService.getProfile(req.user.userId);
+    return await this.profileService.getProfile(req.user.userId);
   }
   
   @ApiOperation({ summary: 'create your profile data' })

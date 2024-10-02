@@ -3,6 +3,7 @@ import { Injectable, NotFoundException, UnauthorizedException } from '@nestjs/co
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import { AstrologyService } from 'src/astrology/astrology.service';
+import { RESPONSE_MESSAGE } from 'src/config/constants';
 import { PostProfileDto } from 'src/dto/profile.dto';
 
 import { Profile } from 'src/schema/profile.schema';
@@ -15,43 +16,57 @@ export class ProfileService {
     private readonly astrologyService: AstrologyService
   ) {}
 
-  async getProfile(userId: string): Promise<ExtendedProfile> {
+  async getProfile(userId: string) {
     const profile = await this.profileModel.findOne({ userId }).lean().exec();
 
-    if (!profile) throw new NotFoundException('Profile not found');
+    if (!profile) throw new NotFoundException(RESPONSE_MESSAGE.PROFILE_NOT_FOUND);
 
     const zodiac = this.astrologyService.calculateZodiac(profile.birthday)
     const horoscope = this.astrologyService.calculateHoroscope(profile.birthday)
 
-    return {
+    const data: ExtendedProfile = {
       ...profile,
       zodiac,
       horoscope,
+    }
+
+    return {
+      message: RESPONSE_MESSAGE.GET_PROFILE_SUCCESS,
+      statusCode: 200,
+      data
     };
   }
 
-  async createProfile(userId: string, dto: PostProfileDto): Promise<Profile> {
+  async createProfile(userId: string, dto: PostProfileDto) {
     const checkIfExist = await this.profileModel.findOne({ userId }).exec();;
 
-    if (checkIfExist)
-      throw new UnauthorizedException('Profile already exist for this user!');
+    if (checkIfExist) throw new UnauthorizedException(RESPONSE_MESSAGE.PROFILE_EXISTED);
 
     const newProfile = new this.profileModel({
       ...dto,
       userId,
     });
-    return newProfile.save();
+
+    const res = await newProfile.save();
+
+    return {
+      message: RESPONSE_MESSAGE.CREATE_PROFILE_SUCCESS,
+      statusCode: 201,
+      data: res
+    }
   }
 
-  async updateProfile(userId: string, dto: PostProfileDto): Promise<Profile> {
+  async updateProfile(userId: string, dto: PostProfileDto) {
     const profile = await this.profileModel
       .findOneAndUpdate({ userId }, { $set: dto }, { new: true })
       .exec();
 
-    if (!profile) {
-      throw new NotFoundException('Profile not found');
-    }
+    if (!profile) throw new NotFoundException(RESPONSE_MESSAGE.PROFILE_NOT_FOUND);
 
-    return profile;
+    return {
+      message: RESPONSE_MESSAGE.UPDATE_PROFILE_SUCCESS,
+      statusCode: 201,
+      data: profile
+    };
   }
 }
